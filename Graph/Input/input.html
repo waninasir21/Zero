@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equation Grapher - Input</title>
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Use Inter font, Tailwind's default sans-serif */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* gray-700 */
+            border-radius: 10px;
+        }
+        /* Style for the special keyboard buttons */
+        .key {
+            @apply bg-gray-700 text-gray-200 font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-150 ease-in-out;
+            @apply hover:bg-gray-600 hover:shadow-lg active:bg-gray-800 active:transform active:scale-95;
+            user-select: none; /* Prevent text selection on rapid clicks */
+        }
+        .key-func {
+            @apply bg-blue-700 hover:bg-blue-600 active:bg-blue-800;
+        }
+        .key-op {
+            @apply bg-gray-600 hover:bg-gray-500 active:bg-gray-700;
+        }
+        .key-del {
+            @apply bg-red-700 hover:bg-red-600 active:bg-red-800;
+        }
+        /* Transition for keyboard toggle */
+        #keyboardContainer {
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            max-height: 500px; /* Set to max expected height */
+            opacity: 1;
+        }
+        #keyboardContainer.hidden {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+    <a href="file:///F:/PROJECTS/Zero/home.html" class="absolute  ml-2 bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-all">
+                &larr; Back
+            </a>
+    <div class="mx-[390px] mt-5 max-w-xl">
+        <!-- Header -->
+        <header class=" text-center mb-8">
+            
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                2D Equation Grapher
+            </h1>
+            <p class="text-gray-400 mt-2">Enter an equation to plot.</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="bg-gray-800 shadow-2xl rounded-lg p-6 mb-4">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-grow flex items-center bg-gray-900 border border-gray-700 rounded-lg">
+                    <span class="text-gray-400 pl-4 pr-2">f(x) =</span>
+                    <input type="text" id="equationInput"
+                           class="flex-grow bg-transparent p-3 text-white placeholder-gray-500 focus:outline-none"
+                           placeholder="e.g., x^2 or sin(x) / x">
+                </div>
+                <button id="plotButton" 
+                        class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 active:bg-blue-800 transform hover:scale-105 transition-all duration-200">
+                    Graph It!
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 text-center mt-4">
+                Use <code class="bg-gray-700 px-1 rounded-sm">^</code> for superscripts (e.g., <code class="bg-gray-700 px-1 rounded-sm">x^2</code>).
+            </p>
+        </div>
+
+        <!-- Keyboard Toggle -->
+        <div class="flex justify-center mb-4">
+            <button id="toggleKeyboard" class="text-sm text-blue-400 hover:text-blue-300 transition-all">
+                Show/Hide Keyboard
+            </button>
+        </div>
+
+        <!-- Special Keyboard -->
+        <div id="keyboardContainer" class="bg-gray-800 shadow-2xl rounded-lg p-4 overflow-hidden">
+            <div class="grid grid-cols-6 gap-2">
+                <!-- Row 1: Functions -->
+                <button class="key key-func" data-key="sin(">sin</button>
+                <button class="key key-func" data-key="cos(">cos</button>
+                <button class="key key-func" data-key="tan(">tan</button>
+                <button class="key key-func" data-key="log(">log</button>
+                <button class="key key-func" data-key="exp(">exp</button>
+                <button class="key key-func" data-key="sqrt(">sqrt</button>
+                <!-- Row 2: Ops & Utils -->
+                <button class="key key-op" data-key="x">x</button>
+                <button class="key key-op" data-key="^">^</button>
+                <button class="key key-op" data-key="(">(</button>
+                <button class="key key-op" data-key=")">)</button>
+                <button class="key key-del col-span-2" data-key="DEL">DEL</button>
+                <!-- Row 3: Numbers & Ops -->
+                <button class="key" data-key="7">7</button>
+                <button class="key" data-key="8">8</button>
+                <button class="key" data-key="9">9</button>
+                <button class="key key-op" data-key="/">/</button>
+                <button class="key key-del col-span-2" data-key="CLR">CLEAR</button>
+                <!-- Row 4: Numbers & Ops -->
+                <button class="key" data-key="4">4</button>
+                <button class="key" data-key="5">5</button>
+                <button class="key" data-key="6">6</button>
+                <button class="key key-op" data-key="*">*</button>
+                <button class="key key-op" data-key="+">+</button>
+                <button class="key key-op" data-key="-">-</button>
+                <!-- Row 5: Numbers -->
+                <button class="key" data-key="1">1</button>
+                <button class="key" data-key="2">2</button>
+                <button class="key" data-key="3">3</button>
+                <button class="key" data-key="0">0</button>
+                <button class="key" data-key=".">.</button>
+                <button class="key" data-key="pi">π</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const equationInput = document.getElementById('equationInput');
+        const plotButton = document.getElementById('plotButton');
+        const keyboardContainer = document.getElementById('keyboardContainer');
+        const toggleKeyboard = document.getElementById('toggleKeyboard');
+
+        /**
+         * Inserts text at the current cursor position in the input field
+         */
+        function insertAtCursor(myField, myValue) {
+            if (document.selection) {
+                // IE
+                myField.focus();
+                let sel = document.selection.createRange();
+                sel.text = myValue;
+            } else if (myField.selectionStart || myField.selectionStart == '0') {
+                // Modern browsers
+                let startPos = myField.selectionStart;
+                let endPos = myField.selectionEnd;
+                myField.value = myField.value.substring(0, startPos) +
+                    myValue +
+                    myField.value.substring(endPos, myField.value.length);
+                myField.selectionStart = startPos + myValue.length;
+                myField.selectionEnd = startPos + myValue.length;
+                myField.focus();
+            } else {
+                myField.value += myValue;
+                myField.focus();
+            }
+        }
+
+        /**
+         * Handles keyboard button clicks
+         */
+        keyboardContainer.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') return;
+
+            const key = e.target.dataset.key;
+
+            switch (key) {
+                case 'DEL':
+                    // Simulate backspace
+                    let startPos = equationInput.selectionStart;
+                    let endPos = equationInput.selectionEnd;
+                    if (startPos > 0 && startPos === endPos) {
+                        equationInput.value = equationInput.value.substring(0, startPos - 1) +
+                                             equationInput.value.substring(endPos, equationInput.value.length);
+                        equationInput.selectionStart = startPos - 1;
+                        equationInput.selectionEnd = startPos - 1;
+                    } else {
+                        equationInput.value = equationInput.value.substring(0, startPos) +
+                                             equationInput.value.substring(endPos, equationInput.value.length);
+                        equationInput.selectionStart = startPos;
+                        equationInput.selectionEnd = startPos;
+                    }
+                    equationInput.focus();
+                    break;
+                case 'CLR':
+                    equationInput.value = '';
+                    equationInput.focus();
+                    break;
+                default:
+                    insertAtCursor(equationInput, key);
+            }
+        });
+
+        /**
+         * Toggles the keyboard visibility
+         */
+        toggleKeyboard.addEventListener('click', () => {
+            keyboardContainer.classList.toggle('hidden');
+        });
+
+        /**
+         * Navigates to the graph page with the equation
+         */
+        function goToGraph() {
+            const equation = equationInput.value;
+            if (!equation) {
+                alert("Please enter an equation.");
+                return;
+            }
+            // URL-encode the equation string to safely pass it as a parameter
+            const encodedEquation = encodeURIComponent(equation);
+            window.location.href = `file:///F:/PROJECTS/Zero/Graph/Output/output.html?equation=${encodedEquation}`;
+        }
+
+        // --- Event Listeners ---
+        plotButton.addEventListener('click', goToGraph);
+        equationInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                goToGraph();
+            }
+        });
+        
+        // By default, show the keyboard
+        keyboardContainer.classList.remove('hidden');
+
+    </script>
+</body>
+</html>

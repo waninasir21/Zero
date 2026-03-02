@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #111827;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .timer {
+            font-size: 1.5rem; font-weight: bold; color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1); padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; border: 2px solid #60a5fa;
+        }
+        .timer.warning {
+            color: #f97316; border-color: #f97316;
+            background: rgba(249, 115, 22, 0.1); animation: pulse 1s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        .option-btn {
+            background: rgba(30, 41, 59, 0.8); border: 2px solid rgba(148, 163, 184, 0.3);
+            color: #e2e8f0; padding: 1rem; border-radius: 0.5rem;
+            cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: left;
+        }
+        .option-btn:hover {
+            background: rgba(96, 165, 250, 0.2); border-color: #60a5fa; transform: translateX(5px);
+        }
+        .option-btn.selected { background: #667eea; border-color: #667eea; }
+        
+        .difficulty-btn {
+            padding: 1.5rem; border-radius: 1rem; font-size: 1.25rem;
+            font-weight: bold; border: 3px solid transparent;
+            transition: all 0.3s ease; cursor: pointer; text-align: left;
+        }
+        .difficulty-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+        .difficulty-btn.beginner { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .difficulty-btn.medium { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .difficulty-btn.hard { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(148, 163, 184, 0.2);
+            border-radius: 10px; overflow: hidden; margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        .score-display {
+            font-size: 4rem; font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .hidden { display: none; }
+        .page {
+            min-height: 100vh; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="startPage" class="page fade-in">
+        <a href="file:///F:/PROJECTS/Zero/home.html" class="absolute mt-5 ml-2 bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-all">&larr; Back</a>
+
+        <div class="container bg-gray-900 mx-auto px-4 py-6 max-w-4xl">
+            <div class="text-center mb-10">
+                <h1 class="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Math Quiz Master</h1>
+                <p class="text-xl text-gray-200">Test Your Mathematical Skills</p>
+            </div>
+
+            <div class="bg-gray-800 rounded-xl shadow-2xl p-8 mb-8 border border-gray-700">
+                <h2 class="text-2xl font-bold text-center mb-8 text-blue-400">Select Difficulty Level</h2>
+                
+                <div class="grid gap-6">
+                    <button class="difficulty-btn text-center beginner" onclick="startQuiz('beginner')">
+                        Beginner
+                        <div class="text-sm font-normal opacity-90 mt-2">10 Questions • Addition & Subtraction</div>
+                    </button>
+
+                    <button class="difficulty-btn text-center medium" onclick="startQuiz('medium')">
+                        Medium
+                        <div class="text-sm font-normal opacity-90 mt-2">20 Questions • Multiplication & Division</div>
+                    </button>
+
+                    <button class="difficulty-btn text-center hard" onclick="startQuiz('hard')">
+                        Hard
+                        <div class="text-sm font-normal opacity-90 mt-2">30 Questions • Advanced Logic</div>
+                    </button>
+
+                    <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+                        <p>⏱️ Each quiz has a 20-minute time limit</p>
+                        <p class="mt-2">📊 Your progress will be saved as you go</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizPage" class="page fade-in hidden">
+        <div class="container mx-auto max-w-3xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold text-white">Math Quiz</h1>
+                    <p class="text-gray-300 mt-2">Question <span id="questionNum">1</span> of <span id="totalQuestions">10</span></p>
+                </div>
+                <div class="timer" id="timer">20:00</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur rounded-2xl p-8 border border-gray-700 fade-in">
+                <h2 id="questionText" class="text-3xl font-bold text-white mb-8 text-center"></h2>
+
+                <div class="grid gap-4 grid-cols-1 md:grid-cols-2" id="optionsContainer">
+                    </div>
+
+                <div class="flex gap-4 mt-8 justify-between">
+                    <button onclick="previousQuestion()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition-colors opacity-50 cursor-not-allowed" id="prevBtn" disabled>
+                        ← Previous
+                    </button>
+                    <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors" id="nextBtn">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsPage" class="page fade-in hidden">
+        <div class="container mx-auto max-w-2xl">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold text-white mb-8">Quiz Complete! 🎉</h1>
+
+                <div class="bg-gray-800 bg-opacity-50 backdrop-blur rounded-2xl p-12 border border-gray-700">
+                    <p class="text-2xl text-gray-300 mb-6">Your Score</p>
+                    <div class="score-display" id="scoreDisplay">0/10</div>
+
+                    <div class="mt-8 text-xl text-gray-300">
+                        <p class="mb-4">Correct Answers: <span class="text-green-400 font-bold" id="correctCount">0</span></p>
+                        <p class="mb-4">Incorrect Answers: <span class="text-red-400 font-bold" id="incorrectCount">0</span></p>
+                        <p class="mb-4">Accuracy: <span class="text-blue-400 font-bold" id="accuracy">0</span>%</p>
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-gray-700">
+                        <p class="text-lg font-semibold" id="feedbackText"></p>
+                    </div>
+
+                    <button onclick="resetQuiz()" class="mt-8 bg-gradient-to-r from-blue-600 to-blue-800 hover:bg-gray-900 text-white font-bold py-4 px-12 rounded-lg transition-all text-lg">
+                        Take Another Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- INTERNAL QUESTION GENERATOR (No API) ---
+        
+        // Helper: Random Integer between min and max (inclusive)
+        const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // Generator Functions
+        const generators = {
+            beginner: () => {
+                const type = rand(0, 1); // 0: Add, 1: Sub
+                let a = rand(1, 50);
+                let b = rand(1, 50);
+                let qStr = "", ans = 0;
+
+                if(type === 0) { 
+                    qStr = `${a} + ${b} = ?`; 
+                    ans = a + b; 
+                } else {
+                    // Ensure positive result for beginner
+                    if(a < b) [a, b] = [b, a];
+                    qStr = `${a} - ${b} = ?`;
+                    ans = a - b;
+                }
+                return { q: qStr, a: ans };
+            },
+            medium: () => {
+                const type = rand(0, 2); // 0: Mult, 1: Div, 2: Mixed Add/Sub
+                let a, b, ans, qStr;
+
+                if (type === 0) {
+                    a = rand(2, 12); b = rand(2, 12);
+                    qStr = `${a} × ${b} = ?`;
+                    ans = a * b;
+                } else if (type === 1) {
+                    // Ensure clean division
+                    b = rand(2, 10); ans = rand(2, 12);
+                    a = b * ans;
+                    qStr = `${a} ÷ ${b} = ?`;
+                } else {
+                    a = rand(10, 50); b = rand(5, 20); const c = rand(5, 20);
+                    qStr = `${a} + ${b} - ${c} = ?`;
+                    ans = a + b - c;
+                }
+                return { q: qStr, a: ans };
+            },
+            hard: () => {
+                const type = rand(0, 3); // 0: BODMAS, 1: Square, 2: Percentage, 3: Algebra
+                let a, b, c, ans, qStr;
+
+                if (type === 0) { // Mixed Operations
+                    a = rand(5, 20); b = rand(2, 10); c = rand(2, 5);
+                    qStr = `${a} + ${b} × ${c} = ?`;
+                    ans = a + (b * c);
+                } else if (type === 1) { // Squares
+                    a = rand(11, 25);
+                    qStr = `What is ${a}²?`;
+                    ans = a * a;
+                } else if (type === 2) { // Percentages
+                    a = rand(1, 9) * 10; // 10, 20...90%
+                    b = rand(2, 20) * 10; // 20, 30...200
+                    qStr = `What is ${a}% of ${b}?`;
+                    ans = (a / 100) * b;
+                } else { // Algebra
+                    ans = rand(2, 15);
+                    a = rand(2, 5);
+                    b = rand(10, 50);
+                    // Solve for x: ax + b = result
+                    let result = (a * ans) + b;
+                    qStr = `Solve for x: ${a}x + ${b} = ${result}`;
+                }
+                return { q: qStr, a: ans };
+            }
+        };
+
+        function generateQuizData(difficulty) {
+            const counts = { beginner: 10, medium: 20, hard: 30 };
+            const count = counts[difficulty];
+            const questions = [];
+
+            for (let i = 0; i < count; i++) {
+                // Generate core Question & Answer
+                const { q, a } = generators[difficulty]();
+
+                // Generate 3 unique wrong answers
+                const options = new Set();
+                options.add(a);
+
+                while(options.size < 4) {
+                    let offset = rand(-10, 10);
+                    if (offset === 0) continue;
+                    let wrong = a + offset;
+                    // Prevent negative options for beginner/medium if logic requires
+                    if (difficulty !== 'hard' && wrong < 0) wrong = Math.abs(wrong); 
+                    options.add(wrong);
+                }
+
+                // Convert Set to Array and Shuffle
+                const optsArray = Array.from(options);
+                // Simple shuffle
+                optsArray.sort(() => Math.random() - 0.5);
+                
+                // Find correct index
+                const correctIndex = optsArray.indexOf(a);
+
+                questions.push({
+                    q: q,
+                    opts: optsArray,
+                    ans: correctIndex
+                });
+            }
+            return questions;
+        }
+
+        // --- GAME LOGIC ---
+
+        let currentDifficulty = 'beginner';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let selectedAnswers = [];
+        let timeRemaining = 1200;
+        let timerInterval = null;
+
+        function startQuiz(difficulty) {
+            currentDifficulty = difficulty;
+            
+            // Generate Data
+            currentQuestions = generateQuizData(difficulty);
+            
+            // Reset State
+            currentQuestionIndex = 0;
+            selectedAnswers = new Array(currentQuestions.length).fill(null);
+            timeRemaining = 1200; // 20 mins
+
+            // Switch UI
+            document.getElementById('startPage').classList.add('hidden');
+            document.getElementById('quizPage').classList.remove('hidden');
+            document.getElementById('resultsPage').classList.add('hidden');
+
+            // Update Counts
+            document.getElementById('totalQuestions').textContent = currentQuestions.length;
+
+            loadQuestion();
+            startTimer();
+        }
+
+        function loadQuestion() {
+            const qData = currentQuestions[currentQuestionIndex];
+
+            // Update Header
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            
+            // Update Question Text
+            document.getElementById('questionText').textContent = qData.q;
+
+            // Generate Options
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            qData.opts.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = optText;
+                
+                if (selectedAnswers[currentQuestionIndex] === index) {
+                    btn.classList.add('selected');
+                }
+
+                btn.onclick = () => selectAnswer(index);
+                container.appendChild(btn);
+            });
+
+            updateProgressBar();
+            updateButtons();
+        }
+
+        function selectAnswer(index) {
+            selectedAnswers[currentQuestionIndex] = index;
+            loadQuestion(); // Re-render to show selection styling
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Prev Button State
+            if (currentQuestionIndex === 0) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Next/Submit Button State
+            if (currentQuestionIndex === currentQuestions.length - 1) {
+                nextBtn.textContent = 'Submit Quiz →';
+                nextBtn.onclick = submitQuiz;
+                nextBtn.className = "bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors";
+            } else {
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = nextQuestion;
+                nextBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors";
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    const mins = Math.floor(timeRemaining / 60);
+                    const secs = timeRemaining % 60;
+                    document.getElementById('timer').textContent = 
+                        `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                    
+                    if (timeRemaining < 300) document.getElementById('timer').classList.add('warning');
+                } else {
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+
+            let correctCount = 0;
+            currentQuestions.forEach((q, idx) => {
+                if (selectedAnswers[idx] === q.ans) correctCount++;
+            });
+
+            const total = currentQuestions.length;
+            const accuracy = Math.round((correctCount / total) * 100);
+
+            // Show Results
+            document.getElementById('quizPage').classList.add('hidden');
+            document.getElementById('resultsPage').classList.remove('hidden');
+
+            document.getElementById('scoreDisplay').textContent = `${correctCount}/${total}`;
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = total - correctCount;
+            document.getElementById('accuracy').textContent = accuracy;
+
+            let feedback = '';
+            if (accuracy >= 90) feedback = "🌟 Outstanding! You're a math master!";
+            else if (accuracy >= 70) feedback = "🎉 Great job! You did very well!";
+            else if (accuracy >= 50) feedback = "📚 Good work! Keep practicing!";
+            else feedback = "Don't give up! Try again!";
+            
+            document.getElementById('feedbackText').textContent = feedback;
+        }
+
+        function resetQuiz() {
+            document.getElementById('startPage').classList.remove('hidden');
+            document.getElementById('resultsPage').classList.add('hidden');
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('timer').textContent = "20:00";
+        }
+    </script>
+</body>
+</html>

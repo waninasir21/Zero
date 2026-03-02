@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Table Generator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="table.css">
+</head>
+<body class="bg-gray-900 text-gray-200 flex min-h-screen">
+    <a href="file:///F:/PROJECTS/Zero/home.html" class="absolute mt-5 ml-2 bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-all">&larr; Back</a>
+    <div class="bg-gray-800 shadow-2xl rounded-lg p-6 mb-4 w-full max-w-md rounded-2xl mx-[450px] mt-5">
+        
+        <!-- Header -->
+        <div class=" text-center mb-8">
+
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Multiplication Tables</h1>
+            <p class="text-gray-400 mt-2">Enter a number and a range to generate its table.</p>
+        </div>
+
+        <!-- Input Form -->
+        <div class="space-y-4">
+            <div>
+                <label for="numberInput" class="text-sm font-medium text-gray-400">Number</label>
+                <input type="number" id="numberInput" placeholder="e.g., 5" class="mt-1 bg-gray-900 text-gray-200 w-full px-4 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label for="rangeInput" class="text-sm font-medium text-gray-400">Range (up to)</label>
+                <input type="number" id="rangeInput" value="10" placeholder="e.g., 10" class="mt-1 bg-gray-900 text-gray-200 w-full px-4 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <button id="generateBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105">
+                Generate Table
+            </button>
+        </div>
+
+        <!-- Error Message Display -->
+        <div id="error-message" class="text-red-500 text-center mt-4 font-medium"></div>
+
+        <!-- Result Display Area -->
+        <div id="table-container" class="mt-8">
+            <!-- The generated table will be inserted here -->
+        </div>
+
+    </div>
+
+    <script src="table.js"></script>
+
+</body>
+</html>
